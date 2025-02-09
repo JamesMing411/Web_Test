@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .firework {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Pacifico', cursive;
+            font-size: 50px;
+            font-weight: bold;
+            color: #ffffff; /* Set text color to white */
+            text-align: center;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+            text-shadow: 4px 4px 15px rgba(255, 255, 255, 0.9), 0px 0px 20px rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 30px;
+            border-radius: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .image-container {
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            max-width: 90vw;
+            max-height: 90vh;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .proposal-image {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-text"> Answer The Question, Please!!!</div>
+
+    <div class="image-container">
+        <img src="https://i.imgur.com/Txk3Qfw.jpeg" alt="Romantic Proposal" class="proposal-image">
+    </div>
+
+    <script>
+        const colors = ['#ff0000', '#ffa500', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff', '#ff69b4', '#00ff7f', '#ff1493'];
+
+        function randomColor() {
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function createParticle(x, y, color, size) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.background = color;
+            particle.style.borderRadius = '50%';
+            particle.style.boxShadow = `0 0 ${size * 2}px ${color}`;
+            document.body.appendChild(particle);
+            return particle;
+        }
+
+        function createFirework() {
+            const startX = Math.random() * window.innerWidth;
+            const startY = window.innerHeight;
+            const endY = 100 + Math.random() * (window.innerHeight * 0.5);
+
+            const firework = createParticle(startX, startY, randomColor(), 4);
+
+            firework.animate([
+                { transform: 'translateY(0)', opacity: 1 },
+                { transform: `translateY(${endY - startY}px)`, opacity: 1 }
+            ], {
+                duration: 1000 + Math.random() * 500,
+                easing: 'ease-out'
+            }).onfinish = () => {
+                firework.remove();
+                
+                for (let i = 0; i < 50; i++) {
+                    const angle = (i / 50) * Math.PI * 2;
+                    const distance = 100 + Math.random() * 100;
+                    const explosionColor = randomColor();
+                    const particle = createParticle(startX, endY, explosionColor, Math.random() * 4 + 2);
+                    
+                    particle.animate([
+                        { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                        { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`, opacity: 0 }
+                    ], {
+                        duration: 1000 + Math.random() * 1000,
+                        easing: 'cubic-bezier(0.25, .5, .5, .9)'
+                    }).onfinish = () => particle.remove();
+                }
+            };
+        }
+
+        let fireworkCount = 0;
+        const fireworkInterval = setInterval(() => {
+            createFirework();
+            fireworkCount++;
+            if (fireworkCount > 20) {
+                clearInterval(fireworkInterval);
+
+                setTimeout(() => {
+                    document.querySelector('.loading-text').style.opacity = '1';
+
+                    setTimeout(() => {
+                        document.querySelector('.loading-text').style.opacity = '0';
+                        setTimeout(() => {
+                            document.querySelector('.image-container').style.opacity = '1';
+                        }, 2000);
+                    }, 3000);
+                }, 1000);
+            }
+        }, 200);
+    </script>
+</body>
+</html>
